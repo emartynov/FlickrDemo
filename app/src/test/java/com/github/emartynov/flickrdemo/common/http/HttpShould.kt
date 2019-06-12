@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.http
+package com.github.emartynov.flickrdemo.common.http
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

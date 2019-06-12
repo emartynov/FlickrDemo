@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.http
+package com.github.emartynov.flickrdemo.common.http
 
 import java.io.BufferedInputStream
 import java.net.HttpURLConnection

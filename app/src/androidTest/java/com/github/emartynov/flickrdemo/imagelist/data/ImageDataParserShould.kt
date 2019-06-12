@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.data
+package com.github.emartynov.flickrdemo.imagelist.data
 
 import androidx.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat

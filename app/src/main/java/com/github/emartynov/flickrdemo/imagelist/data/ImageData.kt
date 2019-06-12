@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.data
+package com.github.emartynov.flickrdemo.imagelist.data
 
 data class ImageData(
     val id: String,
