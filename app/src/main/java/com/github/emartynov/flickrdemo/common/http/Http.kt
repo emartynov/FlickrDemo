@@ -4,8 +4,12 @@ import java.io.BufferedInputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-class Http {
-    fun get(url: String): ByteArray {
+interface Http {
+    fun get(url: String): ByteArray
+}
+
+internal class HttpImpl : Http {
+    override fun get(url: String): ByteArray {
         val urlConnection = URL(url).openConnection() as HttpURLConnection
 
         try {

@@ -3,8 +3,8 @@ package com.github.emartynov.flickrdemo.common.http
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class HttpShould {
-    private val http = Http()
+class HttpImplShould {
+    private val http = HttpImpl()
 
     @Test
     fun `Fetch binary http content`() {
