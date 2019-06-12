@@ -1,9 +1,10 @@
 package com.github.emartynov.flickrdemo.imagelist.data
 
+import com.github.emartynov.flickrdemo.common.json.JsonParser
 import org.json.JSONObject
 
-class ImageDataParser {
-    fun parse(json: String): ImageData {
+class ImageDataJsonParser : JsonParser<ImageData> {
+    override fun parse(json: String): ImageData {
         val jsonObject = JSONObject(json)
 
         return ImageData(

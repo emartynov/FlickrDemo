@@ -7,7 +7,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ImageDataParserShould {
-    private val parser = ImageDataParser()
+    private val parser = ImageDataJsonParser()
 
     @Test
     fun correctlyParseJsonToObject() {
