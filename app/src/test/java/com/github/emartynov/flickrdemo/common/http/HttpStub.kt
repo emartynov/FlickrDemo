@@ -1,6 +1,6 @@
 package com.github.emartynov.flickrdemo.common.http
 
-class StubHttp : Http {
+class HttpStub : Http {
     private val stubs = HashMap<String, ByteArray>()
 
     override fun get(url: String) = stubs[url] as ByteArray
