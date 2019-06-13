@@ -9,7 +9,14 @@ import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCase
 import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCaseImpl
 import java.util.*
 
-class ImageSearchModel(
+enum class State {
+    LOADING,
+    READY,
+    ERROR
+}
+
+class ImageListSearchModel(
+    var state: State = State.LOADING,
     var currentPage: Int = 0,
     var totalPages: Int = 0,
     var searchString: String? = null,
@@ -21,18 +28,30 @@ class ImageSearchModel(
     )
 ) : Observable() {
     fun search(searchString: String) {
+        loadListUseCase.cancel()
         this.searchString = searchString
         currentPage = 0
         totalPages = 0
         images.clear()
+        state = State.LOADING
 
         loadListUseCase.loadPhotos(searchString) {
             currentPage = it.page
             totalPages = it.totalPages
             images.addAll(it.images)
+            state = State.READY
 
-            setChanged()
-            notifyObservers()
+            updateObserverWithChanges()
         }
+        updateObserverWithChanges()
+    }
+
+    private fun updateObserverWithChanges() {
+        setChanged()
+        notifyObservers()
+    }
+
+    fun clear() {
+        loadListUseCase.cancel()
     }
 }
