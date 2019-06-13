@@ -7,12 +7,16 @@ import com.github.emartynov.flickrdemo.common.json.JsonParser
 import com.github.emartynov.flickrdemo.imagelist.data.PageData
 import java.util.concurrent.Callable
 
-class LoadListUseCase(
+interface LoadListUseCase {
+    fun loadPhotos(search: String, callback: (PageData) -> Unit)
+}
+
+class LoadListUseCaseImpl(
     private val http: Http,
     private val jsonParser: JsonParser<PageData>,
     private val async: Async
-) {
-    fun loadPhotos(search: String, callback: (PageData) -> Unit) {
+) : LoadListUseCase {
+    override fun loadPhotos(search: String, callback: (PageData) -> Unit) {
         async.queue(
             job = Callable {
                 val data = http.get(FlickApi.getSearchUrl(search))

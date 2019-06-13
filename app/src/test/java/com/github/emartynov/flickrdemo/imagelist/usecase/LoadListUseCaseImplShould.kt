@@ -7,12 +7,12 @@ import com.github.emartynov.flickrdemo.imagelist.data.PageDataJsonParserStub
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class LoadListUseCaseShould {
+class LoadListUseCaseImplShould {
     private val http = HttpStub()
     private val jsonPageDataParser = PageDataJsonParserStub()
     private val async = AsyncStub()
 
-    private val useCase = LoadListUseCase(http, jsonPageDataParser, async)
+    private val useCase = LoadListUseCaseImpl(http, jsonPageDataParser, async)
 
     @Test
     fun `Correctly form url for search request`() {
