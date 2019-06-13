@@ -1,6 +1,4 @@
-package com.github.emartynov.flickrdemo.common
-
-import com.github.emartynov.flickrdemo.common.async.UiThreadDelivery
+package com.github.emartynov.flickrdemo.common.async
 
 class UiThreadDeliveryStub : UiThreadDelivery {
     private val runnableList = mutableListOf<Runnable>()

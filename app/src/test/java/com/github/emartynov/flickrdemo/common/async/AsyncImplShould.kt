@@ -1,6 +1,5 @@
-package com.github.emartynov.flickrdemo.common
+package com.github.emartynov.flickrdemo.common.async
 
-import com.github.emartynov.flickrdemo.common.async.AsyncImpl
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.util.concurrent.Callable

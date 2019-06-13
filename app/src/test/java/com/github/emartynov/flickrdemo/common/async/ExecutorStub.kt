@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.common
+package com.github.emartynov.flickrdemo.common.async
 
 import java.util.concurrent.Executor
 
