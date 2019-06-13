@@ -10,6 +10,10 @@ interface Http {
 
 internal class HttpImpl : Http {
     override fun get(url: String): ByteArray {
+        if (!(url.startsWith("http://") || url.startsWith("https://")))
+            throw IllegalArgumentException("Supposed to be used only with http protocol in $url")
+
+        @Suppress("CAST_NEVER_SUCCEEDS") // we are sure it will be http connection
         val urlConnection = URL(url).openConnection() as HttpURLConnection
 
         try {

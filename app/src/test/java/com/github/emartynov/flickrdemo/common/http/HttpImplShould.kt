@@ -12,4 +12,9 @@ class HttpImplShould {
 
         assertThat(String(content)).contains("\"content\":\"{}\"")
     }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Throw exception when not http`() {
+        http.get("some://haha")
+    }
 }
