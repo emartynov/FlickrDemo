@@ -9,7 +9,7 @@ import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCase
 import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCaseImpl
 import java.util.*
 
-class ImageListModel(
+class ImageSearchModel(
     var currentPage: Int = 0,
     var totalPages: Int = 0,
     var searchString: String? = null,

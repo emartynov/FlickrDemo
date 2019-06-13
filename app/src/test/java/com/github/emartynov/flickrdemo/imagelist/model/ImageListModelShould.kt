@@ -8,7 +8,7 @@ import org.junit.Test
 
 class ImageListModelShould {
     private val loadListUseCase = LoadListUseCaseStub()
-    private val model = ImageListModel(loadListUseCase = loadListUseCase)
+    private val model = ImageSearchModel(loadListUseCase = loadListUseCase)
 
     @Test
     fun `Update fields after search`() {
