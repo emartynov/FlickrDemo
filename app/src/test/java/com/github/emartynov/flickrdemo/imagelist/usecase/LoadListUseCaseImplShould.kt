@@ -62,6 +62,15 @@ class LoadListUseCaseImplShould {
         useCase.loadPhotos(searchString) { d -> data = d }
 
         assertThat(data).isEqualTo(pageData)
+    }
 
+    @Test
+    fun `Cancel when asked`() {
+        async.execute = false
+        useCase.loadPhotos("some") {}
+
+        useCase.cancel()
+
+        assertThat(async.isCancelled).isTrue()
     }
 }

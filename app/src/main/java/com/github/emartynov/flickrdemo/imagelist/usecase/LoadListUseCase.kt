@@ -9,9 +9,10 @@ import java.util.concurrent.Callable
 
 interface LoadListUseCase {
     fun loadPhotos(search: String, callback: (PageData) -> Unit)
+    fun cancel()
 }
 
-class LoadListUseCaseImpl(
+internal class LoadListUseCaseImpl(
     private val http: Http,
     private val jsonParser: JsonParser<PageData>,
     private val async: Async
@@ -24,5 +25,9 @@ class LoadListUseCaseImpl(
             },
             callback = callback
         )
+    }
+
+    override fun cancel() {
+        async.cancelAll()
     }
 }
