@@ -64,4 +64,8 @@ class ImageListSearchModel(
     fun clear() {
         loadListUseCase.cancel()
     }
+
+    fun retry() {
+        search(searchString ?: "error")
+    }
 }
