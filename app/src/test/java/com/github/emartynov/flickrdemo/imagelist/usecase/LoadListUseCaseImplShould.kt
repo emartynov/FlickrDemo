@@ -19,34 +19,37 @@ class LoadListUseCaseImplShould {
     @Test
     fun `Correctly form url for search request`() {
         val searchString = "kittens"
+        val page = 2
 
-        val url = formSearchString(searchString)
+        val url = formSearchString(searchString, page)
         http.stub(url, ByteArray(0))
         jsonPageDataParser.stubbedData = PageData(page = 0, totalPages = 1, images = emptyList())
 
-        useCase.loadPhotos(searchString) {}
+        useCase.loadPhotos(searchString, page) {}
 
         assertThat(http.invokedUrls).containsExactly(url)
     }
 
-    private fun formSearchString(searchString: String) =
+    private fun formSearchString(searchString: String, page: Int) =
         "https://api.flickr.com/services/rest/?method=flickr.photos.search" +
                 "&api_key=3e7cc266ae2b0e0d78e279ce8e361736" +
                 "&format=json" +
                 "&nojsoncallback=1" +
                 "&safe_search=1" +
-                "&text=$searchString"
+                "&text=$searchString" +
+                "&page=$page"
 
     @Test
     fun `Use json parser`() {
         val searchString = "test"
+        val page = 1
 
-        val url = formSearchString(searchString)
+        val url = formSearchString(searchString, page)
         val response = "Data"
         http.stub(url, response.toByteArray())
         jsonPageDataParser.stubbedData = PageData(page = 0, totalPages = 1, images = emptyList())
 
-        useCase.loadPhotos(searchString) {}
+        useCase.loadPhotos(searchString, page) {}
 
         assertThat(jsonPageDataParser.passedData).isEqualTo(response)
     }
@@ -56,12 +59,13 @@ class LoadListUseCaseImplShould {
         var data: PageData? = null
 
         val searchString = "some"
-        val url = formSearchString(searchString)
+        val page = 1
+        val url = formSearchString(searchString, page)
         val pageData = PageData(page = 0, totalPages = 1, images = emptyList())
         http.stub(url, ByteArray(0))
         jsonPageDataParser.stubbedData = pageData
 
-        useCase.loadPhotos(searchString) { d -> data = d.requireSuccessData() }
+        useCase.loadPhotos(searchString, page) { d -> data = d.requireSuccessData() }
 
         assertThat(data).isEqualTo(pageData)
     }
@@ -69,7 +73,7 @@ class LoadListUseCaseImplShould {
     @Test
     fun `Cancel when asked`() {
         async.execute = false
-        useCase.loadPhotos("some") {}
+        useCase.loadPhotos("some", 1) {}
 
         useCase.cancel()
 
@@ -81,7 +85,7 @@ class LoadListUseCaseImplShould {
         http.error(IllegalStateException("Test"))
         var recordedResult: AsyncResult<PageData>? = null
 
-        useCase.loadPhotos("some") { recordedResult = it }
+        useCase.loadPhotos("some", 1) { recordedResult = it }
 
         assertThat(recordedResult).isInstanceOf(Failure::class.java)
     }

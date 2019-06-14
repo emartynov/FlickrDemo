@@ -9,7 +9,7 @@ import com.github.emartynov.flickrdemo.imagelist.data.PageData
 import java.util.concurrent.Callable
 
 interface LoadListUseCase {
-    fun loadPhotos(search: String, callback: (AsyncResult<PageData>) -> Unit)
+    fun loadPhotos(search: String, page: Int, callback: (AsyncResult<PageData>) -> Unit)
     fun cancel()
 }
 
@@ -18,10 +18,10 @@ internal class LoadListUseCaseImpl(
     private val jsonParser: JsonParser<PageData>,
     private val async: Async
 ) : LoadListUseCase {
-    override fun loadPhotos(search: String, callback: (AsyncResult<PageData>) -> Unit) {
+    override fun loadPhotos(search: String, page: Int, callback: (AsyncResult<PageData>) -> Unit) {
         async.queue(
             job = Callable {
-                val data = http.get(FlickApi.getSearchUrl(search))
+                val data = http.get(FlickApi.getSearchUrl(search, page))
                 jsonParser.parse(String(data))
             },
             callback = callback
