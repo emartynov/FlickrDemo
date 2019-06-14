@@ -1,12 +1,17 @@
 package com.github.emartynov.flickrdemo.imagelist.ui
 
+import android.app.SearchManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
 import android.widget.AbsListView
 import android.widget.Button
 import android.widget.GridView
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import com.github.emartynov.flickrdemo.R
 import com.github.emartynov.flickrdemo.common.async.AsyncImpl
 import com.github.emartynov.flickrdemo.common.http.HttpImpl
@@ -43,12 +48,27 @@ class MainActivity : AppCompatActivity() {
 
                 imagesAdapter.setImages(model.images)
             }
-
-            model.search("kittens")
         }
 
         retryButton.setOnClickListener { model?.retry() }
         setupGridView()
+
+        handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (Intent.ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+                model?.run {
+                    search(query)
+                }
+            }
+        }
     }
 
     private fun setupGridView() {
@@ -73,6 +93,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the options menu from XML
+        val inflater = menuInflater
+        inflater.inflate(R.menu.opitions_menu, menu)
+
+        // Get the SearchView and set the searchable configuration
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.menu_search).actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
+        }
+
+        return true
     }
 
     override fun onDestroy() {

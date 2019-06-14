@@ -2,4 +2,6 @@
   <string name="app_name">FlickrDemo</string>
     <string name="some_error_happened">Some error happened!</string>
   <string name="retry">Retry</string>
+    <string name="search_hint">Type search</string>
+  <string name="search">Search</string>
 </resources>
