@@ -8,8 +8,9 @@ class FlickApiShould {
     @Test
     fun `Correctly form search url`() {
         val searchString = "test"
+        val page = 6
 
-        assertThat(FlickApi.getSearchUrl(searchString))
+        assertThat(FlickApi.getSearchUrl(searchString, page))
             .isEqualTo(
                 "https://api.flickr.com/services/rest/" +
                         "?method=flickr.photos.search" +
@@ -17,7 +18,8 @@ class FlickApiShould {
                         "&format=json" +
                         "&nojsoncallback=1" +
                         "&safe_search=1" +
-                        "&text=$searchString"
+                        "&text=$searchString" +
+                        "&page=$page"
             )
     }
 
