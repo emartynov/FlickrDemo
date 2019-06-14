@@ -1,6 +1,8 @@
 package com.github.emartynov.flickrdemo.imagelist.usecase
 
 import com.github.emartynov.flickrdemo.common.async.AsyncStub
+import com.github.emartynov.flickrdemo.common.http.AsyncResult
+import com.github.emartynov.flickrdemo.common.http.Failure
 import com.github.emartynov.flickrdemo.common.http.HttpStub
 import com.github.emartynov.flickrdemo.imagelist.data.PageData
 import com.github.emartynov.flickrdemo.imagelist.data.PageDataJsonParserStub
@@ -59,7 +61,7 @@ class LoadListUseCaseImplShould {
         http.stub(url, ByteArray(0))
         jsonPageDataParser.stubbedData = pageData
 
-        useCase.loadPhotos(searchString) { d -> data = d }
+        useCase.loadPhotos(searchString) { d -> data = d.requireSuccessData() }
 
         assertThat(data).isEqualTo(pageData)
     }
@@ -72,5 +74,15 @@ class LoadListUseCaseImplShould {
         useCase.cancel()
 
         assertThat(async.isCancelled).isTrue()
+    }
+
+    @Test
+    fun `Pass failure to callback`() {
+        http.error(IllegalStateException("Test"))
+        var recordedResult: AsyncResult<PageData>? = null
+
+        useCase.loadPhotos("some") { recordedResult = it }
+
+        assertThat(recordedResult).isInstanceOf(Failure::class.java)
     }
 }
