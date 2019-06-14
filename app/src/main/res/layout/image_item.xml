@@ -3,8 +3,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent" android:layout_height="match_parent"
              android:minHeight="128dp"
-             android:minWidth="128dp"
-             android:padding="8dp">
+             android:minWidth="128dp">
     <ImageView
             android:id="@+id/image_view"
             android:contentDescription="@null"

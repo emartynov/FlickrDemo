@@ -7,6 +7,9 @@ import android.widget.GridView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.ContentLoadingProgressBar
 import com.github.emartynov.flickrdemo.R
+import com.github.emartynov.flickrdemo.common.async.AsyncImpl
+import com.github.emartynov.flickrdemo.common.http.HttpImpl
+import com.github.emartynov.flickrdemo.common.image.BitmapScaleImpl
 import com.github.emartynov.flickrdemo.imagelist.model.ImageListSearchModel
 import com.github.emartynov.flickrdemo.imagelist.model.State
 
@@ -20,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val retryButton: Button
             by lazy(LazyThreadSafetyMode.NONE) { findViewById<Button>(R.id.retry_button) }
 
-    private val imagesAdapter = ImagesAdapter()
+    private val imagesAdapter = ImagesAdapter(HttpImpl(), AsyncImpl(), BitmapScaleImpl())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

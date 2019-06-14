@@ -1,31 +1,61 @@
 package com.github.emartynov.flickrdemo.imagelist
 
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.github.emartynov.flickrdemo.R
+import com.github.emartynov.flickrdemo.common.async.Async
+import com.github.emartynov.flickrdemo.common.http.FlickApi
+import com.github.emartynov.flickrdemo.common.http.Http
+import com.github.emartynov.flickrdemo.common.http.Success
+import com.github.emartynov.flickrdemo.common.image.BitmapScale
 import com.github.emartynov.flickrdemo.imagelist.data.ImageData
+import java.util.concurrent.Callable
 
-class ImagesAdapter : BaseAdapter() {
+
+class ImagesAdapter(
+    private val http: Http,
+    private val async: Async,
+    private val bitmapScale: BitmapScale
+) : BaseAdapter() {
     private val images = mutableListOf<ImageData>()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = if (convertView == null) {
             val layoutInflater = LayoutInflater.from(parent.context)
-            layoutInflater.inflate(R.layout.image_item, parent, false)
+            layoutInflater.inflate(com.github.emartynov.flickrdemo.R.layout.image_item, parent, false)
         } else {
             convertView
         }
 
-        val imageView = view.findViewById<ImageView>(R.id.image_view)
-        val textView = view.findViewById<TextView>(R.id.title_view)
+        val imageView = view.findViewById<ImageView>(com.github.emartynov.flickrdemo.R.id.image_view)
+        val textView = view.findViewById<TextView>(com.github.emartynov.flickrdemo.R.id.title_view)
 
         imageView.visibility = View.GONE
         textView.visibility = View.VISIBLE
         textView.text = images[position].title
+
+        async.cancel(view)
+        async.queue(
+            job = Callable {
+                val data = http.get(FlickApi.getImageUrl(images[position]))
+                val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+                bitmapScale.scaleCenterCrop(bitmap, view.measuredWidth, view.measuredHeight)
+            },
+            callback = {
+                if (it is Success) {
+                    imageView.setImageBitmap(it.data)
+                    imageView.visibility = View.VISIBLE
+                    textView.visibility = View.GONE
+                } else {
+                    // ignore image loading errors for now
+                }
+            },
+            tag = view
+        )
 
         return view
     }
