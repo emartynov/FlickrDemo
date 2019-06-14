@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.imagelist
+package com.github.emartynov.flickrdemo.imagelist.ui
 
 import android.os.Bundle
 import android.view.View

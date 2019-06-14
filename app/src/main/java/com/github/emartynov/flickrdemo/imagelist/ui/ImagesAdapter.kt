@@ -1,4 +1,4 @@
-package com.github.emartynov.flickrdemo.imagelist
+package com.github.emartynov.flickrdemo.imagelist.ui
 
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
@@ -14,7 +14,6 @@ import com.github.emartynov.flickrdemo.common.http.Success
 import com.github.emartynov.flickrdemo.common.image.BitmapScale
 import com.github.emartynov.flickrdemo.imagelist.data.ImageData
 import java.util.concurrent.Callable
-
 
 class ImagesAdapter(
     private val http: Http,
