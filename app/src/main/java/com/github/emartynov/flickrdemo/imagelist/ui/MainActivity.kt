@@ -16,6 +16,7 @@ import com.github.emartynov.flickrdemo.R
 import com.github.emartynov.flickrdemo.common.async.AsyncImpl
 import com.github.emartynov.flickrdemo.common.http.HttpImpl
 import com.github.emartynov.flickrdemo.common.image.BitmapScaleImpl
+import com.github.emartynov.flickrdemo.common.image.Cache
 import com.github.emartynov.flickrdemo.common.image.CacheImpl
 import com.github.emartynov.flickrdemo.common.ui.OnScrollListenerAdapter
 import com.github.emartynov.flickrdemo.imagelist.model.ImageListSearchModel
@@ -31,10 +32,13 @@ class MainActivity : AppCompatActivity() {
     private val retryButton: Button
             by lazy(LazyThreadSafetyMode.NONE) { findViewById<Button>(R.id.retry_button) }
 
-    private val imagesAdapter = ImagesAdapter(HttpImpl(), AsyncImpl(), BitmapScaleImpl(), CacheImpl())
+    private val imagesAdapter = ImagesAdapter(HttpImpl(), AsyncImpl(), BitmapScaleImpl(), createOrGetCache())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportActionBar?.title = ""
+
         setContentView(R.layout.activity_main)
 
         if (model == null) {
@@ -42,11 +46,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         model?.also { model ->
-            model.addObserver { _, _ ->
-                progressView.visibility = if (model.state == State.LOADING) View.VISIBLE else View.GONE
-                errorView.visibility = if (model.state == State.ERROR) View.VISIBLE else View.GONE
+            updateViewWithModel(model)
 
-                imagesAdapter.setImages(model.images)
+            model.addObserver { _, _ ->
+                updateViewWithModel(model)
             }
         }
 
@@ -54,6 +57,13 @@ class MainActivity : AppCompatActivity() {
         setupGridView()
 
         handleIntent(intent)
+    }
+
+    private fun updateViewWithModel(model: ImageListSearchModel) {
+        progressView.visibility = if (model.state == State.LOADING) View.VISIBLE else View.GONE
+        errorView.visibility = if (model.state == State.ERROR) View.VISIBLE else View.GONE
+
+        imagesAdapter.setImages(model.images)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -68,6 +78,7 @@ class MainActivity : AppCompatActivity() {
                     search(query)
                 }
             }
+            setIntent(null)
         }
     }
 
@@ -81,6 +92,8 @@ class MainActivity : AppCompatActivity() {
                     visibleItemCount: Int,
                     totalItemCount: Int
                 ) {
+                    if (totalItemCount == 0) return
+
                     val lastInScreen = firstVisibleItem + visibleItemCount
 
                     model?.run {
@@ -115,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         if (isFinishing) {
             model?.clear()
             model = null
+            cache = null
         }
 
         super.onDestroy()
@@ -122,5 +136,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var model: ImageListSearchModel? = null
+        var cache: Cache? = null
+
+        fun createOrGetCache(): Cache {
+            return cache ?: CacheImpl().also { cache = it }
+        }
     }
 }
