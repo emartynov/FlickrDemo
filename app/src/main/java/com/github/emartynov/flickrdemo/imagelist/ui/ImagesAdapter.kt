@@ -47,7 +47,7 @@ class ImagesAdapter(
                 val destWidth = view.measuredWidth
                 val destHeight = view.measuredHeight
                 val key = Triple(url, destWidth, destHeight)
-                cache.get(key) ?: loadFromServer(key)
+                cache.get(key) ?: loadResizeAndCache(key)
             },
             callback = {
                 if (it is Success) {
@@ -64,10 +64,11 @@ class ImagesAdapter(
         return view
     }
 
-    private fun loadFromServer(key: Triple<String, Int, Int>): Bitmap {
-        val data = http.get(key.first)
-        val bitmap =
-            bitmapScale.scaleCenterCrop(BitmapFactory.decodeByteArray(data, 0, data.size), key.second, key.third)
+    private fun loadResizeAndCache(key: Triple<String, Int, Int>): Bitmap {
+        val (url, width, height) = key
+        val data = http.get(url)
+        val originalBitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+        val bitmap = bitmapScale.scaleCenterCrop(originalBitmap, width, height)
         cache.put(key, bitmap)
         return bitmap
     }
