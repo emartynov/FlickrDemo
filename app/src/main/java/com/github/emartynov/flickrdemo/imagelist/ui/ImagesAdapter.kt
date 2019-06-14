@@ -40,6 +40,7 @@ class ImagesAdapter(
         textView.visibility = View.VISIBLE
         textView.text = images[position].title
 
+        async.cancel(view)
         async.queue(
             job = Callable {
                 val url = FlickApi.getImageUrl(images[position])
