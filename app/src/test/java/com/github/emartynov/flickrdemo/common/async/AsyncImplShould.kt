@@ -1,5 +1,6 @@
 package com.github.emartynov.flickrdemo.common.async
 
+import com.github.emartynov.flickrdemo.common.http.Failure
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.util.concurrent.Callable
@@ -19,7 +20,7 @@ class AsyncImplShould {
         val callable = Callable<Int> { value }
         var returnedValue = 0
 
-        async.queue(job = callable, callback = { v -> returnedValue = v })
+        async.queue(job = callable, callback = { v -> returnedValue = v.requireSuccessData() })
         executor.runJob()
         uiThreadDelivery.runAll()
 
@@ -64,11 +65,23 @@ class AsyncImplShould {
         val callable = Callable<Int> { value }
         var returnedValue = 0
 
-        async.queue(job = callable, callback = { v -> returnedValue = v }, tag = tag)
+        async.queue(job = callable, callback = { v -> returnedValue = v.requireSuccessData() }, tag = tag)
         async.cancel(tag)
         executor.runJob()
         uiThreadDelivery.runAll()
 
         assertThat(returnedValue).isNotEqualTo(value)
+    }
+
+    @Test
+    fun `Wrap exception in AsyncResult Failure`() {
+        val exception = NullPointerException("Test")
+        var recordedException: Throwable? = null
+
+        async.queue(job = Callable { throw exception }, callback = { recordedException = (it as? Failure)?.error })
+        executor.runJob()
+        uiThreadDelivery.runAll()
+
+        assertThat(recordedException).isEqualTo(exception)
     }
 }

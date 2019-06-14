@@ -1,9 +1,10 @@
 package com.github.emartynov.flickrdemo.common.async
 
+import com.github.emartynov.flickrdemo.common.http.AsyncResult
 import java.util.concurrent.*
 
 interface Async {
-    fun <T> queue(job: Callable<T>, callback: (T) -> Unit, tag: Any = Any())
+    fun <T : Any> queue(job: Callable<T>, callback: (AsyncResult<T>) -> Unit, tag: Any = Any())
     fun cancelAll()
     fun cancel(tag: Any)
 }
@@ -21,9 +22,13 @@ internal class AsyncImpl(
 ) : Async {
     private val jobs = HashMap<Any, Future<*>>()
 
-    override fun <T> queue(job: Callable<T>, callback: (T) -> Unit, tag: Any) {
+    override fun <T : Any> queue(job: Callable<T>, callback: (AsyncResult<T>) -> Unit, tag: Any) {
         val future = executor.submit {
-            val value = job.call()
+            val value = try {
+                AsyncResult.success(job.call())
+            } catch (e: Exception) {
+                AsyncResult.failure<T>(e)
+            }
 
             // check if cancelled
             if (jobs[tag]?.isCancelled == false)
