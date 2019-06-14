@@ -1,6 +1,7 @@
 package com.github.emartynov.flickrdemo.imagelist.model
 
 import com.github.emartynov.flickrdemo.common.async.AsyncImpl
+import com.github.emartynov.flickrdemo.common.http.AsyncResult
 import com.github.emartynov.flickrdemo.common.http.Failure
 import com.github.emartynov.flickrdemo.common.http.HttpImpl
 import com.github.emartynov.flickrdemo.common.http.Success
@@ -20,7 +21,7 @@ enum class State {
 
 class ImageListSearchModel(
     var state: State = State.READY,
-    var currentPage: Int = 0,
+    var currentPage: Int = 1,
     var totalPages: Int = 0,
     var searchString: String? = null,
     val images: MutableList<ImageData> = mutableListOf(),
@@ -33,19 +34,12 @@ class ImageListSearchModel(
     fun search(searchString: String) {
         loadListUseCase.cancel()
         this.searchString = searchString
-        currentPage = 0
+        currentPage = 1
         totalPages = 0
         images.clear()
         state = State.LOADING
 
-        loadListUseCase.loadPhotos(searchString) {
-            when (it) {
-                is Success -> processSuccess(it.data)
-                is Failure -> state = State.ERROR
-            }
-
-            updateObserverWithChanges()
-        }
+        loadListUseCase.loadPhotos(searchString, currentPage) { processPhotosLoad(it) }
         updateObserverWithChanges()
     }
 
@@ -67,5 +61,25 @@ class ImageListSearchModel(
 
     fun retry() {
         search(searchString ?: "error")
+    }
+
+    fun loadPage(pageToLoad: Int) {
+        // guard of loading more pages
+        if (state == State.LOADING && pageToLoad == currentPage + 1) return
+
+        state = State.LOADING
+
+        // search string should not be null, added fallback of error if assumption is wrong
+        loadListUseCase.loadPhotos(searchString ?: "error", pageToLoad) { processPhotosLoad(it) }
+        updateObserverWithChanges()
+    }
+
+    private fun processPhotosLoad(result: AsyncResult<PageData>) {
+        when (result) {
+            is Success -> processSuccess(result.data)
+            is Failure -> state = State.ERROR
+        }
+
+        updateObserverWithChanges()
     }
 }

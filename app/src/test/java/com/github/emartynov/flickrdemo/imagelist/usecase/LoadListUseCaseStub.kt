@@ -6,8 +6,10 @@ import com.github.emartynov.flickrdemo.imagelist.data.PageData
 class LoadListUseCaseStub : LoadListUseCase {
     var data: AsyncResult<PageData>? = null
     var isCancelled = false
+    var numberOfCalls = 0
 
-    override fun loadPhotos(search: String, callback: (AsyncResult<PageData>) -> Unit) {
+    override fun loadPhotos(search: String, page: Int, callback: (AsyncResult<PageData>) -> Unit) {
+        numberOfCalls++
         data?.run {
             callback(this)
         }

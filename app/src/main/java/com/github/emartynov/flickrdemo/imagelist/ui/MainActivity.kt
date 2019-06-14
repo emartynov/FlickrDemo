@@ -2,6 +2,7 @@ package com.github.emartynov.flickrdemo.imagelist.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.AbsListView
 import android.widget.Button
 import android.widget.GridView
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import com.github.emartynov.flickrdemo.R
 import com.github.emartynov.flickrdemo.common.async.AsyncImpl
 import com.github.emartynov.flickrdemo.common.http.HttpImpl
 import com.github.emartynov.flickrdemo.common.image.BitmapScaleImpl
+import com.github.emartynov.flickrdemo.common.ui.OnScrollListenerAdapter
 import com.github.emartynov.flickrdemo.imagelist.model.ImageListSearchModel
 import com.github.emartynov.flickrdemo.imagelist.model.State
 
@@ -46,7 +48,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         retryButton.setOnClickListener { model?.retry() }
+        setupGridView()
+    }
+
+    private fun setupGridView() {
         gridView.adapter = imagesAdapter
+        gridView.setOnScrollListener(
+            object : OnScrollListenerAdapter() {
+                override fun onScroll(
+                    view: AbsListView,
+                    firstVisibleItem: Int,
+                    visibleItemCount: Int,
+                    totalItemCount: Int
+                ) {
+                    val lastInScreen = firstVisibleItem + visibleItemCount
+
+                    model?.run {
+                        val pageToLoad = this.currentPage + 1
+                        // request new page when in the middle of the current one
+                        if (lastInScreen >= totalItemCount - totalItemCount / 2 && pageToLoad <= this.totalPages) {
+                            this.loadPage(pageToLoad)
+                        }
+                    }
+                }
+            }
+        )
     }
 
     override fun onDestroy() {

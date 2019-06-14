@@ -46,7 +46,7 @@ class ImageListSearchModelShould {
 
         model.search("some")
 
-        assertThat(model.currentPage).isEqualTo(0)
+        assertThat(model.currentPage).isEqualTo(1)
         assertThat(model.totalPages).isEqualTo(0)
         assertThat(model.images).isEmpty()
     }
@@ -87,6 +87,53 @@ class ImageListSearchModelShould {
         model.search("test")
 
         assertThat(model.state).isEqualTo(State.ERROR)
+    }
+
+    @Test
+    fun `Delegate next page load to use case`() {
+        loadListUseCase.data = AsyncResult.success(PageData(page = 1, totalPages = 456, images = emptyList()))
+        model.search("test")
+        loadListUseCase.data = AsyncResult.success(PageData(page = 2, totalPages = 456, images = emptyList()))
+
+        model.loadPage(2)
+
+        assertThat(model.currentPage).isEqualTo(2)
+    }
+
+    @Test
+    fun `Ignore sequential asks for page load`() {
+        loadListUseCase.data = AsyncResult.success(PageData(page = 1, totalPages = 456, images = emptyList()))
+        model.search("test")
+        loadListUseCase.data = null
+
+        model.loadPage(2)
+        model.loadPage(2)
+        model.loadPage(2)
+
+        assertThat(loadListUseCase.numberOfCalls).isEqualTo(2)
+    }
+
+    @Test
+    fun `Set state to loading when next page is requested`() {
+        loadListUseCase.data = AsyncResult.success(PageData(page = 1, totalPages = 456, images = emptyList()))
+        model.search("test")
+        loadListUseCase.data = null
+
+        model.loadPage(2)
+
+        assertThat(model.state).isEqualTo(State.LOADING)
+    }
+
+    @Test
+    fun `Notify observer when page is loaded`() {
+        loadListUseCase.data = AsyncResult.success(PageData(page = 100, totalPages = 456, images = emptyList()))
+        model.search("test")
+        var dataChanged = false
+        model.addObserver { _, _ -> dataChanged = true }
+
+        model.loadPage(2)
+
+        assertThat(dataChanged).isTrue()
     }
 
     private fun createTestImageData() =
