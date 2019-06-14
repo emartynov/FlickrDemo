@@ -1,9 +1,12 @@
 package com.github.emartynov.flickrdemo.imagelist.model
 
 import com.github.emartynov.flickrdemo.common.async.AsyncImpl
+import com.github.emartynov.flickrdemo.common.http.Failure
 import com.github.emartynov.flickrdemo.common.http.HttpImpl
+import com.github.emartynov.flickrdemo.common.http.Success
 import com.github.emartynov.flickrdemo.imagelist.data.ImageData
 import com.github.emartynov.flickrdemo.imagelist.data.ImageDataJsonParser
+import com.github.emartynov.flickrdemo.imagelist.data.PageData
 import com.github.emartynov.flickrdemo.imagelist.data.PageDataJsonParser
 import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCase
 import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCaseImpl
@@ -16,7 +19,7 @@ enum class State {
 }
 
 class ImageListSearchModel(
-    var state: State = State.LOADING,
+    var state: State = State.READY,
     var currentPage: Int = 0,
     var totalPages: Int = 0,
     var searchString: String? = null,
@@ -36,14 +39,21 @@ class ImageListSearchModel(
         state = State.LOADING
 
         loadListUseCase.loadPhotos(searchString) {
-            currentPage = it.page
-            totalPages = it.totalPages
-            images.addAll(it.images)
-            state = State.READY
+            when (it) {
+                is Success -> processSuccess(it.data)
+                is Failure -> state = State.ERROR
+            }
 
             updateObserverWithChanges()
         }
         updateObserverWithChanges()
+    }
+
+    private fun processSuccess(data: PageData) {
+        currentPage = data.page
+        totalPages = data.totalPages
+        images.addAll(data.images)
+        state = State.READY
     }
 
     private fun updateObserverWithChanges() {

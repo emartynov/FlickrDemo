@@ -1,5 +1,6 @@
 package com.github.emartynov.flickrdemo.imagelist.model
 
+import com.github.emartynov.flickrdemo.common.http.AsyncResult
 import com.github.emartynov.flickrdemo.imagelist.data.ImageData
 import com.github.emartynov.flickrdemo.imagelist.data.PageData
 import com.github.emartynov.flickrdemo.imagelist.usecase.LoadListUseCaseStub
@@ -16,7 +17,8 @@ class ImageListSearchModelShould {
         val totalPages = 456
         val page = 100
         val searchString = "test"
-        loadListUseCase.data = PageData(page = page, totalPages = totalPages, images = listOf(imageData))
+        loadListUseCase.data =
+            AsyncResult.success(PageData(page = page, totalPages = totalPages, images = listOf(imageData)))
 
         model.search(searchString)
 
@@ -27,7 +29,7 @@ class ImageListSearchModelShould {
 
     @Test
     fun `Notify observer when data is loaded`() {
-        loadListUseCase.data = PageData(page = 100, totalPages = 456, images = emptyList())
+        loadListUseCase.data = AsyncResult.success(PageData(page = 100, totalPages = 456, images = emptyList()))
         var dataChanged = false
         model.addObserver { _, _ -> dataChanged = true }
 
@@ -71,11 +73,20 @@ class ImageListSearchModelShould {
 
     @Test
     fun `Set state to ready after successful data loading`() {
-        loadListUseCase.data = PageData(page = 100, totalPages = 456, images = emptyList())
+        loadListUseCase.data = AsyncResult.success(PageData(page = 100, totalPages = 456, images = emptyList()))
 
         model.search("test")
 
         assertThat(model.state).isEqualTo(State.READY)
+    }
+
+    @Test
+    fun `Convert failure to the error state`() {
+        loadListUseCase.data = AsyncResult.failure(NullPointerException("Test"))
+
+        model.search("test")
+
+        assertThat(model.state).isEqualTo(State.ERROR)
     }
 
     private fun createTestImageData() =
