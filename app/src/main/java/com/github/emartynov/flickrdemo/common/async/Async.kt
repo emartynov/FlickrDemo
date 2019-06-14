@@ -12,7 +12,7 @@ interface Async {
 private val NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors()
 
 /**
- * Class that will run job on thread executor and allow to cancel it by tag or all
+ * Class that will run job on thread executor and allow to cancel job by tag or all
  */
 internal class AsyncImpl(
     private val queue: BlockingQueue<Runnable> = LinkedBlockingQueue<Runnable>(),
