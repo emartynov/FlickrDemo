@@ -2,25 +2,28 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:orientation="horizontal"
              android:layout_height="match_parent"
-             android:layout_width="match_parent"
-             android:layout_gravity="center">
+             android:layout_width="match_parent">
     <GridView
             android:id="@+id/images_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="3"
-            android:visibility="gone"/>
+            android:numColumns="3"/>
 
-    <androidx.core.widget.ContentLoadingProgressBar
+    <ProgressBar
             android:id="@+id/progress_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:indeterminate="true"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+
+    />
 
     <LinearLayout
             android:id="@+id/error_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:visibility="gone"
             android:orientation="vertical">
 
         <TextView
